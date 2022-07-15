@@ -8,12 +8,13 @@ import com.example.carmanager.service.producer.IProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-@Repository
+@RestController
 @RequestMapping("/cars")
 @CrossOrigin("*")
 public class CarController {
@@ -46,8 +47,12 @@ public class CarController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Car> delete(@PathVariable Long id) {
-        carService.remove(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Optional<Car> optionalCar = carService.findById(id);
+        if (optionalCar.isPresent()) {
+            carService.remove(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/{id}")
@@ -61,5 +66,15 @@ public class CarController {
     public ResponseEntity<Iterable<IMaxPrice>> maxPrice() {
         Iterable<IMaxPrice> iMaxPrices = carService.getMaxPrice();
         return new ResponseEntity<>(iMaxPrices,HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Car>> findAllByName (@RequestParam("name") String name) {
+        try{
+            List<Car> list = carService.findByName(name);
+            return new ResponseEntity<>(list,HttpStatus.OK);
+        }catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+        }
     }
 }

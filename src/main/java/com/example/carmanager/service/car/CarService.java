@@ -6,6 +6,7 @@ import com.example.carmanager.repository.ICarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,4 +37,14 @@ public class CarService implements ICarService{
     public Iterable<IMaxPrice> getMaxPrice() {
         return carRepository.getMaxPrice();
     }
-}
+
+    @Override
+    public List<Car> findByName(String name) {
+        if (name==null || name.equals("")) {
+            throw new IllegalArgumentException("Name is required");
+        }
+        return carRepository.findByName(name);
+    }
+    }
+
+
